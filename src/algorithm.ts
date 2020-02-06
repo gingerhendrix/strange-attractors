@@ -55,10 +55,7 @@ export const makePoints = () => {
     }
   }
 
-  const width = maxX - minX;
-  const height = maxY - minY;
-
-  return {points, width, height, minX, minY};
+  return {points, minX, minY, maxX, maxY};
 }
 
 
