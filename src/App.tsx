@@ -1,24 +1,19 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import logo from './logo.svg';
 import './App.css';
+import {makePoints} from './algorithm';
+
+
 
 const App = () => {
+  const {points, width, height, minX, minY} = useMemo(makePoints, [])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <br />
+      <svg width="1200" height="1200">
+        {points.map(([x, y], i) =>  <circle key={i} cx={ 50 + (x - minX)*1150/width} cy={50 + (y - minY)*1150/height} r="0.5"/>)}
+      </svg>
     </div>
   );
 }
