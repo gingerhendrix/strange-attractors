@@ -22,13 +22,16 @@ export const labelToCoefficients = (s: string): [QuadraticCoefficients, Quadrati
 
 export const coefficientsLabel = (xcs: QuadraticCoefficients, ycs: QuadraticCoefficients): string => [...xcs, ...ycs].map(coeffLabel).join('')
 
+// BQVRVSECCUIM
+// LTTKPFXOKOGH
+// JLSCHWYPIJQN
+
 export const makePoints = (coefficients: [QuadraticCoefficients, QuadraticCoefficients]) => {
   // const coefficients = samples[2];
   const iterator = buildIterators(coefficients[0], coefficients[1]);
 
   let [x, y] = [0.05, 0.05]
 
-  console.log({coefficients});
   for(let i=0; i< 5000; i++) {
     [x, y] = [iterator[0](x, y), iterator[1](x, y)]
     if(Math.abs(x) + Math.abs(y) > 100000) { //Unstable
@@ -41,7 +44,7 @@ export const makePoints = (coefficients: [QuadraticCoefficients, QuadraticCoeffi
   let maxX = x;
   let maxY = y;
 
-  for(let i=0; i< 100000; i++) {
+  for(let i=0; i< 10000000; i++) {
     [x, y] = [iterator[0](x, y), iterator[1](x, y)]
     points.push([x, y]);
     minX = Math.min(minX, x);
@@ -80,11 +83,9 @@ export const intensityMap: (input: IntensityMapInput) => Array<Array<number>> = 
     maxIntensity = Math.max(maxIntensity, intensity);
   });
 
-  const linearScale = (i: number) => Math.round(i * 255/maxIntensity)
-  const logScale = (i: number) => Math.round(Math.log(i) * 255/Math.log(maxIntensity))
-  const squareRootScale = (i: number) => Math.round(Math.sqrt(i) * 255/(Math.sqrt(maxIntensity)))
+  const linearScale = (i: number) => i/maxIntensity
 
-  const scaledMap = map.map((row, y) => row.map(squareRootScale));
+  const scaledMap = map.map((row, y) => row.map(linearScale));
 
   return scaledMap;
 }

@@ -12,7 +12,7 @@ import IntensityCanvas from './IntensityCanvas';
 
 const App = () => {
   const [coefficients, setCoefficients] = 
-    useState<[QuadraticCoefficients, QuadraticCoefficients]>([[0,0,0,0,0,0], [0,0,0,0,0,0]]);
+    useState<[QuadraticCoefficients, QuadraticCoefficients]>(labelToCoefficients("JLSCHWYPIJQN"))
   const [coefficientInput, setCoefficientInput] = 
     useState<string>(coefficientsLabel(coefficients[0], coefficients[1]))
 
@@ -27,7 +27,9 @@ const App = () => {
   const onRefresh = () => {
     const newCoefficients = [randomCoefficients(), randomCoefficients()];
     setCoefficients([newCoefficients[0], newCoefficients[1]])
-    setCoefficientInput(coefficientsLabel(newCoefficients[0], newCoefficients[1]))
+    const label = coefficientsLabel(newCoefficients[0], newCoefficients[1])
+    console.log(label)
+    setCoefficientInput(label)
   }
   return (
       <div>
@@ -39,7 +41,9 @@ const App = () => {
           onBlur={() => setCoefficients(labelToCoefficients(coefficientInput))}
         />
         </div>
-        <IntensityCanvas points={points} maxX={maxX} maxY={maxY} minX={minX} minY={minY}/>
+        <div style={{padding: 50}}>
+          <IntensityCanvas points={points} maxX={maxX} maxY={maxY} minX={minX} minY={minY}/>
+        </div>
       </div>
       );
   }

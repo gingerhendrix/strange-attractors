@@ -1,5 +1,6 @@
 import React, {useMemo, useRef, useEffect} from 'react';
 import {intensityMap} from './algorithm';
+import chroma from 'chroma-js';
 
 const Canvas: React.FC<({
   width?: number,
@@ -33,11 +34,12 @@ const Canvas: React.FC<({
 
     const map = intensityMap({width, height, points, maxX, maxY, minX, minY});
 
+    const colorScale = chroma.scale('YlGnBu');
+    const scaleTransform = 0.4; //Vary between 0 and 1 to tweak color scale
     map.forEach(
       (col, y) => col.forEach((i, x) => {
         if(i > 0) {
-          const color = `rgba(${255 - i}, ${255 - i}, ${255 - i}, 1)`;
-          ctx.fillStyle =  color
+          ctx.fillStyle = colorScale(Math.pow(i, scaleTransform)).toString();
           ctx.fillRect(x, y, 1, 1)
         }
       })
