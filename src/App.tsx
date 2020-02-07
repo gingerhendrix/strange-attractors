@@ -8,6 +8,7 @@ import {
   QuadraticCoefficients
 } from './algorithm';
 import Canvas from './Canvas';
+import IntensityCanvas from './IntensityCanvas';
 
 const App = () => {
   const [coefficients, setCoefficients] = 
@@ -33,12 +34,12 @@ const App = () => {
         <div>
         <button onClick={onRefresh}>Refresh</button>
         <input
-          value={coefficientInput} 
+          value={coefficientInput}
           onChange={(e) => setCoefficientInput(e.target.value)}
           onBlur={() => setCoefficients(labelToCoefficients(coefficientInput))}
         />
         </div>
-        <Canvas points={points} maxX={maxX} maxY={maxY} minX={minX} minY={minY}/>
+        <IntensityCanvas points={points} maxX={maxX} maxY={maxY} minX={minX} minY={minY}/>
       </div>
       );
   }

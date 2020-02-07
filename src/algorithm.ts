@@ -55,5 +55,38 @@ export const makePoints = (coefficients: [QuadraticCoefficients, QuadraticCoeffi
   return {points, minX, minY, maxX, maxY};
 }
 
-
 export type Attractor = ReturnType<typeof makePoints>;
+interface IntensityMapInput extends Attractor {
+    width: number,
+    height: number,
+}
+
+
+export const intensityMap: (input: IntensityMapInput) => Array<Array<number>> = ({points, width, height, minX, minY, maxX, maxY}) => {
+  let maxIntensity = 1;
+
+  const map = Array(height).fill(0).map(() => Array(width).fill(0));
+  if(maxX === minX || maxY === minY) {
+    return map;
+  }
+  const xDiff = maxX - minX
+  const yDiff = maxY - minY
+  const transformX = (x: number) => Math.floor((x - minX)*(width - 1)/xDiff)
+  const transformY = (x: number) => Math.floor((x - minY)*(height - 1)/yDiff)
+
+  points.forEach(([x, y]) => {
+    const [ym, xm] = [transformY(y), transformX(x)]
+    const intensity = map[ym][xm]++
+    maxIntensity = Math.max(maxIntensity, intensity);
+  });
+
+  const linearScale = (i: number) => Math.round(i * 255/maxIntensity)
+  const logScale = (i: number) => Math.round(Math.log(i) * 255/Math.log(maxIntensity))
+  const squareRootScale = (i: number) => Math.round(Math.sqrt(i) * 255/(Math.sqrt(maxIntensity)))
+
+  const scaledMap = map.map((row, y) => row.map(squareRootScale));
+
+  return scaledMap;
+}
+
+
