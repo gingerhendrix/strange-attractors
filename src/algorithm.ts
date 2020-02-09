@@ -3,6 +3,20 @@ export type QuadraticCoefficients = [number, number, number, number, number, num
 
 type TwoDMap = (x: number, y: number) => number;
 type TwoDIterator = [TwoDMap, TwoDMap];
+type PointArray = Array<[number, number]>
+
+export interface Iteration {
+  points: PointArray,
+  minX: number,
+  maxX: number,
+  minY: number,
+  maxY: number,
+}
+
+export interface Attractor {
+  iterator?: TwoDIterator,
+  iteration: Iteration
+}
 
 const buildTwoDMap = (cs: QuadraticCoefficients): TwoDMap => 
   (x_n, y_n) => cs[0] + (cs[1] * x_n) + (cs[2] * x_n * x_n) + (cs[3] * x_n * y_n) + (cs[4] * y_n ) + (cs[5] * y_n * y_n);
@@ -26,27 +40,50 @@ export const coefficientsLabel = (xcs: QuadraticCoefficients, ycs: QuadraticCoef
 // LTTKPFXOKOGH
 // JLSCHWYPIJQN
 
-export const makePoints = (coefficients: [QuadraticCoefficients, QuadraticCoefficients]) => {
+export const initializePoints = (coefficients: [QuadraticCoefficients, QuadraticCoefficients]) => {
   // const coefficients = samples[2];
   const iterator = buildIterators(coefficients[0], coefficients[1]);
 
   let [x, y] = [0.05, 0.05]
+  let divergent = false;
 
   for(let i=0; i< 5000; i++) {
     [x, y] = [iterator[0](x, y), iterator[1](x, y)]
     if(Math.abs(x) + Math.abs(y) > 100000) { //Unstable
+      divergent = true;
       break;
     }
   }
-  let points: [number, number][] = [];
-  let minX = x;
-  let minY = y;
-  let maxX = x;
-  let maxY = y;
+  return {iterator, x, y, divergent}
+}
 
-  for(let i=0; i< 10000000; i++) {
+export const makePoints = (coefficients: [QuadraticCoefficients, QuadraticCoefficients]) : Attractor => {
+  const {iterator, x, y} = initializePoints(coefficients)
+  const iteration = iterate({numIterations: 100000, iterator, iteration: { x, y, minX: x, maxX: x, minY: y, maxY: y}})
+  return {iterator, iteration};
+}
+
+interface IterateInput {
+  iterator: TwoDIterator,
+  iteration: {
+    x: number,
+    y: number,
+    maxX: number,
+    maxY: number,
+    minX: number,
+    minY: number,
+  }
+  numIterations: number
+}
+
+export const iterate = ({iterator, iteration: {x, y, minX, minY, maxX, maxY}, numIterations = 10000}: IterateInput) : Iteration => {
+  if(!iterator) { return  {points: [[x, y]], minX, minY, maxX, maxY} }
+
+  const newPoints: Array<[number, number]> = [];
+
+  for(let i=0; i< numIterations; i++) {
     [x, y] = [iterator[0](x, y), iterator[1](x, y)]
-    points.push([x, y]);
+    newPoints.push([x, y]);
     minX = Math.min(minX, x);
     minY = Math.min(minY, y);
     maxX = Math.max(maxX, x);
@@ -55,39 +92,48 @@ export const makePoints = (coefficients: [QuadraticCoefficients, QuadraticCoeffi
       break;
     }
   }
-  return {points, minX, minY, maxX, maxY};
+  return {points: newPoints, minX, minY, maxX, maxY};
 }
 
-export type Attractor = ReturnType<typeof makePoints>;
-interface IntensityMapInput extends Attractor {
+interface IntensityMapInput extends Iteration {
     width: number,
     height: number,
 }
 
+export class IntensityMap {
+  public map: Array<Array<number>>
+  public width: number
+  public height: number
+  private maxIntensity: number
+  private transformX: (x: number) => number
+  private transformY: (y: number) => number
 
-export const intensityMap: (input: IntensityMapInput) => Array<Array<number>> = ({points, width, height, minX, minY, maxX, maxY}) => {
-  let maxIntensity = 1;
-
-  const map = Array(height).fill(0).map(() => Array(width).fill(0));
-  if(maxX === minX || maxY === minY) {
-    return map;
+  constructor({width, height, minX, minY, maxX, maxY}: {width:number, height: number, minX: number, minY: number, maxX:number, maxY:number}) {
+    this.width = width
+    this.height = height
+    this.map = Array(height).fill(0).map(() => Array(width).fill(0));
+    this.maxIntensity = 1
+    const xDiff = maxX - minX
+    const yDiff = maxY - minY
+    this.transformX = (x) => Math.floor((x - minX)*(width - 1)/xDiff)
+    this.transformY = (y) => Math.floor((y - minY)*(height - 1)/yDiff)
   }
-  const xDiff = maxX - minX
-  const yDiff = maxY - minY
-  const transformX = (x: number) => Math.floor((x - minX)*(width - 1)/xDiff)
-  const transformY = (x: number) => Math.floor((x - minY)*(height - 1)/yDiff)
 
-  points.forEach(([x, y]) => {
-    const [ym, xm] = [transformY(y), transformX(x)]
-    const intensity = map[ym][xm]++
-    maxIntensity = Math.max(maxIntensity, intensity);
-  });
+  update(points: PointArray) {
+    points.forEach(([x, y]) => {
+      const [ym, xm] = [this.transformY(y), this.transformX(x)]
+      if (this.map[ym] === undefined || this.map[ym][xm] === undefined) {
+        console.log("out of bounds", {xm, ym});
+        return;
+      }
+      const intensity = this.map[ym][xm]++
+      this.maxIntensity = Math.max(this.maxIntensity, intensity);
+    })
+  }
 
-  const linearScale = (i: number) => i/maxIntensity
-
-  const scaledMap = map.map((row, y) => row.map(linearScale));
-
-  return scaledMap;
+  scaled() {
+    const linearScale = (i: number) => i/this.maxIntensity
+    return this.map.map((row, y) => row.map(linearScale));
+  }
 }
-
 

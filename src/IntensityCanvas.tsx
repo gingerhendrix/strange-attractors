@@ -1,25 +1,11 @@
 import React, {useMemo, useRef, useEffect} from 'react';
-import {intensityMap} from './algorithm';
+import {IntensityMap} from './algorithm';
 import chroma from 'chroma-js';
 
 const Canvas: React.FC<({
-  width?: number,
-  height?: number,
-  padding?: number,
-  points: Array<[number, number]>,
-  maxX: number,
-  maxY: number,
-  minX: number,
-  minY: number
+  map: IntensityMap,
 })> = ({
-  width = 1800,
-  height = 1200,
-  padding = 50,
-  points,
-  maxX,
-  maxY,
-  minX,
-  minY
+  map,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -30,13 +16,11 @@ const Canvas: React.FC<({
     const ctx = canvas.getContext('2d');
     if(ctx === null) { return; }
 
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, map.width, map.height);
 
-    const map = intensityMap({width, height, points, maxX, maxY, minX, minY});
-
-    const colorScale = chroma.scale('YlGnBu');
+    const colorScale = chroma.scale('BuPu');
     const scaleTransform = 0.4; //Vary between 0 and 1 to tweak color scale
-    map.forEach(
+    map.scaled().forEach(
       (col, y) => col.forEach((i, x) => {
         if(i > 0) {
           ctx.fillStyle = colorScale(Math.pow(i, scaleTransform)).toString();
@@ -49,7 +33,7 @@ const Canvas: React.FC<({
   return (
     <div className="App">
        <br />
-       <canvas ref={canvasRef} width={width} height={height} />
+       <canvas ref={canvasRef} width={map.width} height={map.height} />
     </div>
   );
 }
