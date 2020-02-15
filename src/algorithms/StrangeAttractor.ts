@@ -1,7 +1,4 @@
-import {
-  TwoDIterator,
-  PointArray,
-} from './types';
+import { TwoDIterator, PointArray } from "./types";
 
 class StrangeAttractor {
   private iterator: TwoDIterator;
@@ -21,7 +18,7 @@ class StrangeAttractor {
 
   public initialize() {
     this.iterate(5000);
-    if(this.divergent) {
+    if (this.divergent) {
       return;
     }
     this.maxX = this.minX = this.x;
@@ -31,11 +28,11 @@ class StrangeAttractor {
   public iterate(numIterations: number = 100000): PointArray {
     const newPoints: PointArray = [];
 
-    for(let i=0; i< numIterations; i++) {
+    for (let i = 0; i < numIterations; i++) {
       [this.x, this.y] = [
         this.iterator[0](this.x, this.y),
-        this.iterator[1](this.x, this.y)
-      ]
+        this.iterator[1](this.x, this.y),
+      ];
       newPoints.push([this.x, this.y]);
 
       this.minX = Math.min(this.minX, this.x);
@@ -43,7 +40,8 @@ class StrangeAttractor {
       this.maxX = Math.max(this.maxX, this.x);
       this.maxY = Math.max(this.maxY, this.y);
 
-      if(Math.abs(this.x) + Math.abs(this.y) > 100000) { //Unstable
+      if (Math.abs(this.x) + Math.abs(this.y) > 100000) {
+        //Unstable
         this.divergent = true;
         break;
       }
@@ -51,7 +49,6 @@ class StrangeAttractor {
 
     return newPoints;
   }
-
 }
 
 export default StrangeAttractor;

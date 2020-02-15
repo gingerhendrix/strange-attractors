@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useEffect} from 'react';
+import React, {useRef, useEffect} from 'react';
 import chroma from 'chroma-js';
 
 const Canvas: React.FC<({
@@ -31,7 +31,7 @@ const Canvas: React.FC<({
         }
       })
     )
-  });
+  }, [intensities, height, width]);
 
   return (
     <div className="App">
