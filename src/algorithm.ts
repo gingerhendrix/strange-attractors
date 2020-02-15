@@ -1,24 +1,6 @@
+import {TwoDMap, TwoDIterator, QuadraticCoefficients, Attractor, Iteration} from './algorithms/types';
 
-export type QuadraticCoefficients = [number, number, number, number, number, number];
-
-type TwoDMap = (x: number, y: number) => number;
-type TwoDIterator = [TwoDMap, TwoDMap];
-type PointArray = Array<[number, number]>
-
-export interface Iteration {
-  points: PointArray,
-  minX: number,
-  maxX: number,
-  minY: number,
-  maxY: number,
-}
-
-export interface Attractor {
-  iterator?: TwoDIterator,
-  iteration: Iteration
-}
-
-const buildTwoDMap = (cs: QuadraticCoefficients): TwoDMap => 
+const buildTwoDMap = (cs: QuadraticCoefficients): TwoDMap =>
   (x_n, y_n) => cs[0] + (cs[1] * x_n) + (cs[2] * x_n * x_n) + (cs[3] * x_n * y_n) + (cs[4] * y_n ) + (cs[5] * y_n * y_n);
 
 const buildIterators: (xcs: QuadraticCoefficients, ycs: QuadraticCoefficients) => TwoDIterator = (xcs, ycs) =>  [
@@ -94,46 +76,3 @@ export const iterate = ({iterator, iteration: {x, y, minX, minY, maxX, maxY}, nu
   }
   return {points: newPoints, minX, minY, maxX, maxY};
 }
-
-interface IntensityMapInput extends Iteration {
-    width: number,
-    height: number,
-}
-
-export class IntensityMap {
-  public map: Array<Array<number>>
-  public width: number
-  public height: number
-  private maxIntensity: number
-  private transformX: (x: number) => number
-  private transformY: (y: number) => number
-
-  constructor({width, height, minX, minY, maxX, maxY}: {width:number, height: number, minX: number, minY: number, maxX:number, maxY:number}) {
-    this.width = width
-    this.height = height
-    this.map = Array(height).fill(0).map(() => Array(width).fill(0));
-    this.maxIntensity = 1
-    const xDiff = maxX - minX
-    const yDiff = maxY - minY
-    this.transformX = (x) => Math.floor((x - minX)*(width - 1)/xDiff)
-    this.transformY = (y) => Math.floor((y - minY)*(height - 1)/yDiff)
-  }
-
-  update(points: PointArray) {
-    points.forEach(([x, y]) => {
-      const [ym, xm] = [this.transformY(y), this.transformX(x)]
-      if (this.map[ym] === undefined || this.map[ym][xm] === undefined) {
-        console.log("out of bounds", {xm, ym});
-        return;
-      }
-      const intensity = this.map[ym][xm]++
-      this.maxIntensity = Math.max(this.maxIntensity, intensity);
-    })
-  }
-
-  scaled() {
-    const linearScale = (i: number) => i/this.maxIntensity
-    return this.map.map((row, y) => row.map(linearScale));
-  }
-}
-

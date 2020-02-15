@@ -1,92 +1,82 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
+import StrangeAttractor from './algorithms/StrangeAttractor';
+import IntensityMap from './algorithms/IntensityMap';
 import {
-  makePoints,
-  coefficientsLabel,
-  labelToCoefficients,
-  randomCoefficients,
-  Attractor,
-  QuadraticCoefficients,
-  iterate,
-  IntensityMap,
-} from './algorithm';
-import Canvas from './Canvas';
+  iteratorFromLabel, 
+  randomCoefficients, 
+  coefficientsLabel
+} from './algorithms/quadraticIterator';
 import IntensityCanvas from './IntensityCanvas';
 
 const App = () => {
-  const [coefficients, setCoefficients] =
-    useState<[QuadraticCoefficients, QuadraticCoefficients]>(labelToCoefficients("LTTKPFXOKOGH"))
-  const [coefficientInput, setCoefficientInput] =
-    useState<string>(coefficientsLabel(coefficients[0], coefficients[1]))
+  const attractorRef = useRef<StrangeAttractor | null>(null);
+  const intensityMapRef = useRef<IntensityMap | null>(null);
+
+  const [coefficientInput, setCoefficientInput] = useState<string>("LTTKPFXOKOGH")
+  const [coefficient, setCoefficient] = useState<string>(coefficientInput)
 
   const [iterationFactor, setIterationFactor] = useState<number>(15)
+  const [intensities, setIntensities] = useState<number[][]>([])
 
   const width = 1200;
   const height = 1200;
 
-  const [intensityMap, setIntensityMap] = useState<IntensityMap | null>(null);
 
-  const [{iterator, iteration}, setLocus] = useState<Attractor>({
-    iteration: {
-      points: [],
-      maxX: 1,
-      maxY: 1,
-      minX: 1,
-      minY: 1,
+  const newIterator = () => {
+    const iterator = iteratorFromLabel(coefficientInput);
+    const attractor = new StrangeAttractor(iterator);
+    attractorRef.current = attractor;
+    attractor.initialize();
+
+    if(attractor.divergent) {
+      intensityMapRef.current = null;
+      setIntensities([]);
+      return;
     }
-  })
 
-  useEffect(
-    () => {
-        const attractor = makePoints(coefficients)
-        const {iteration: {points, maxX, maxY, minX, minY}} = attractor
-        const newIntensityMap = new IntensityMap({width, height, maxX, maxY, minX, minY})
-        newIntensityMap.update(points)
-        setIntensityMap(newIntensityMap)
-        setLocus(attractor)
-    }, 
-    [coefficients]
-  )
+    const points = attractor.iterate()
+    const {maxX, maxY, minX, minY} = attractor;
 
-  const onRefresh = () => {
-    const newCoefficients = [randomCoefficients(), randomCoefficients()];
-    setCoefficients([newCoefficients[0], newCoefficients[1]])
+    const intensityMap = new IntensityMap({width, height, maxX, maxY, minX, minY})
+    intensityMapRef.current = intensityMap;
+    intensityMap.update(points);
+    setIntensities(intensityMap.scaled());
+  }
+
+  useEffect(newIterator, [coefficient]);
+
+  const onRandom = () => {
+    const newCoefficients = [randomCoefficients(), randomCoefficients()]
     const label = coefficientsLabel(newCoefficients[0], newCoefficients[1])
-    console.log(label)
-    setCoefficientInput(label)
-    setIterationFactor(15)
+    setCoefficientInput(label);
+    setCoefficient(label);
+  }
+
+  const onNewCoefficient = () => {
+    setCoefficient(coefficientInput);
   }
 
   const onMorePoints = () => {
-    if(!iterator || !intensityMap) { return }
+    if(!attractorRef.current || !intensityMapRef.current) { return } 
 
-    const [x, y] = iteration.points[iteration.points.length - 1]
-    const new_iteration = iterate({
-      numIterations: Math.pow(2, iterationFactor), 
-      iterator,
-      iteration: {...iteration, x, y }
-    })
-
-    setIterationFactor(iterationFactor + 1)
-    intensityMap.update(new_iteration.points)
-    setIntensityMap(intensityMap)
+    intensityMapRef.current.update(attractorRef.current.iterate());
+    setIntensities(intensityMapRef.current.scaled());
   }
 
-  /* const {points, maxX, maxY, minX, minY} = iteration; */
-  /* console.log("Points", points.length); */
   return (
       <div>
         <div>
-        <button onClick={onRefresh}>Refresh</button>
+        <button onClick={onRandom}>Random</button>
         <input
           value={coefficientInput}
           onChange={(e) => setCoefficientInput(e.target.value)}
-          onBlur={() => setCoefficients(labelToCoefficients(coefficientInput))}
+          onBlur={() => onNewCoefficient()}
         />
 
         <button onClick={onMorePoints}>+</button>
         </div>
         <div style={{padding: 50}}>
-         {intensityMap && <IntensityCanvas map={intensityMap} />}
+         {intensities && <IntensityCanvas intensities={intensities} width={width} height={height} />}
         </div>
       </div>
       );
