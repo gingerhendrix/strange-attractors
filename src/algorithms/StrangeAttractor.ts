@@ -8,6 +8,7 @@ class StrangeAttractor {
   public maxY: number;
   public x: number;
   public y: number;
+  public lyapunov?: number;
   public divergent: boolean = false;
 
   constructor(iterator: TwoDIterator, x: number = 0.05, y: number = 0.05) {
@@ -27,12 +28,23 @@ class StrangeAttractor {
 
   public iterate(numIterations: number = 100000): PointArray {
     const newPoints: PointArray = [];
+    let lSum = 0;
 
     for (let i = 0; i < numIterations; i++) {
-      [this.x, this.y] = [
+      const [newX, newY] = [
         this.iterator[0](this.x, this.y),
         this.iterator[1](this.x, this.y),
       ];
+
+      const xDiff = newX - this.x;
+      const yDiff = newY - this.y;
+      const dl2 = (xDiff*xDiff) + (yDiff*yDiff);
+      if(dl2 > 0) {
+        lSum += Math.log(dl2);
+      }
+
+      this.x = newX;
+      this.y = newY;
       newPoints.push([this.x, this.y]);
 
       this.minX = Math.min(this.minX, this.x);
@@ -46,6 +58,8 @@ class StrangeAttractor {
         break;
       }
     }
+    this.lyapunov = 0.721347 * lSum/newPoints.length;
+    console.log("Lyapunov", this.lyapunov, this.divergent);
 
     return newPoints;
   }

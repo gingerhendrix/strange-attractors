@@ -22,11 +22,30 @@ const App = () => {
   const height = 1200;
 
 
+  const search = () => {
+    let label;
+    while(true) {
+      const newCoefficients = [randomCoefficients(), randomCoefficients()]
+      label = coefficientsLabel(newCoefficients[0], newCoefficients[1])
+      const iterator = iteratorFromLabel(label);
+      const attractor = new StrangeAttractor(iterator);
+      attractorRef.current = attractor;
+      attractor.initialize();
+
+      if(!attractor.divergent && attractor.lyapunov && attractor.lyapunov > -0.1 && attractor.lyapunov < 2.0) {
+        break;
+      }
+    }
+    setCoefficientInput(label);
+    setCoefficient(label);
+  }
+
   const newIterator = () => {
     const iterator = iteratorFromLabel(coefficientInput);
     const attractor = new StrangeAttractor(iterator);
     attractorRef.current = attractor;
     attractor.initialize();
+    attractor.iterate(1000);
 
     if(attractor.divergent) {
       intensityMapRef.current = null;
@@ -66,14 +85,16 @@ const App = () => {
   return (
       <div>
         <div>
-        <button onClick={onRandom}>Random</button>
+        <button onClick={search}>Random</button>
         <input
           value={coefficientInput}
           onChange={(e) => setCoefficientInput(e.target.value)}
           onBlur={() => onNewCoefficient()}
         />
 
+        <span>{intensityMapRef.current && intensityMapRef.current.pointsApplied}</span>
         <button onClick={onMorePoints}>+</button>
+
         </div>
         <div style={{padding: 50}}>
          {intensities && <IntensityCanvas intensities={intensities} width={width} height={height} />}

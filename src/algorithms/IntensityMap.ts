@@ -4,6 +4,7 @@ class IntensityMap {
   public map: Array<Array<number>>;
   public width: number;
   public height: number;
+  public pointsApplied: number;
   private maxIntensity: number;
   private transformX: (x: number) => number;
   private transformY: (y: number) => number;
@@ -33,18 +34,20 @@ class IntensityMap {
     const yDiff = maxY - minY;
     this.transformX = x => Math.floor(((x - minX) * (width - 1)) / xDiff);
     this.transformY = y => Math.floor(((y - minY) * (height - 1)) / yDiff);
+    this.pointsApplied = 0;
   }
 
   update(points: PointArray) {
     points.forEach(([x, y]) => {
       const [ym, xm] = [this.transformY(y), this.transformX(x)];
       if (this.map[ym] === undefined || this.map[ym][xm] === undefined) {
-        console.log("out of bounds", { xm, ym });
+        // console.log("out of bounds", { xm, ym });
         return;
       }
       const intensity = this.map[ym][xm]++;
       this.maxIntensity = Math.max(this.maxIntensity, intensity);
     });
+    this.pointsApplied += points.length;
   }
 
   scaled() {
