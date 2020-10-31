@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.css": "/stange-attractors/static/css/main.5ecd60fb.chunk.css",
-    "main.js": "/stange-attractors/static/js/main.b36c4a53.chunk.js",
-    "main.js.map": "/stange-attractors/static/js/main.b36c4a53.chunk.js.map",
-    "runtime-main.js": "/stange-attractors/static/js/runtime-main.d5b12ed2.js",
-    "runtime-main.js.map": "/stange-attractors/static/js/runtime-main.d5b12ed2.js.map",
-    "static/js/2.fa289e09.chunk.js": "/stange-attractors/static/js/2.fa289e09.chunk.js",
-    "static/js/2.fa289e09.chunk.js.map": "/stange-attractors/static/js/2.fa289e09.chunk.js.map",
-    "index.html": "/stange-attractors/index.html",
-    "precache-manifest.283f835748fad461c8d063071d3d857e.js": "/stange-attractors/precache-manifest.283f835748fad461c8d063071d3d857e.js",
-    "service-worker.js": "/stange-attractors/service-worker.js",
-    "static/css/main.5ecd60fb.chunk.css.map": "/stange-attractors/static/css/main.5ecd60fb.chunk.css.map",
-    "static/js/2.fa289e09.chunk.js.LICENSE.txt": "/stange-attractors/static/js/2.fa289e09.chunk.js.LICENSE.txt"
+    "main.css": "/strange-attractors/static/css/main.5ecd60fb.chunk.css",
+    "main.js": "/strange-attractors/static/js/main.2e9ba84d.chunk.js",
+    "main.js.map": "/strange-attractors/static/js/main.2e9ba84d.chunk.js.map",
+    "runtime-main.js": "/strange-attractors/static/js/runtime-main.6f8f36ee.js",
+    "runtime-main.js.map": "/strange-attractors/static/js/runtime-main.6f8f36ee.js.map",
+    "static/js/2.fa289e09.chunk.js": "/strange-attractors/static/js/2.fa289e09.chunk.js",
+    "static/js/2.fa289e09.chunk.js.map": "/strange-attractors/static/js/2.fa289e09.chunk.js.map",
+    "index.html": "/strange-attractors/index.html",
+    "precache-manifest.3016c98ff5cc67a25d124216ab1c1ae8.js": "/strange-attractors/precache-manifest.3016c98ff5cc67a25d124216ab1c1ae8.js",
+    "service-worker.js": "/strange-attractors/service-worker.js",
+    "static/css/main.5ecd60fb.chunk.css.map": "/strange-attractors/static/css/main.5ecd60fb.chunk.css.map",
+    "static/js/2.fa289e09.chunk.js.LICENSE.txt": "/strange-attractors/static/js/2.fa289e09.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.d5b12ed2.js",
+    "static/js/runtime-main.6f8f36ee.js",
     "static/js/2.fa289e09.chunk.js",
     "static/css/main.5ecd60fb.chunk.css",
-    "static/js/main.b36c4a53.chunk.js"
+    "static/js/main.2e9ba84d.chunk.js"
   ]
 }
