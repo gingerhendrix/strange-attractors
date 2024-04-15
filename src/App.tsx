@@ -85,7 +85,8 @@ const App = () => {
   return (
       <div>
         <div>
-        <button onClick={search}>Random</button>
+        <button onClick={search}>Search</button>
+        <button onClick={onRandom}>Random</button>
         <input
           value={coefficientInput}
           onChange={(e) => setCoefficientInput(e.target.value)}
